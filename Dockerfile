@@ -1,4 +1,12 @@
-FROM node:18.16.0
+# HOW TO DEPLOY THE FORK
+# aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <aws-account-id>.dkr.ecr.us-east-1.amazonaws.com
+# docker build . -t <aws-account-id>.dkr.ecr.us-east-1.amazonaws.com/observability/statsd
+# docker push <aws-account-id>.dkr.ecr.us-east-1.amazonaws.com/observability/statsd
+
+FROM node:18.20.3
+
+# Update OS packages to reduce vulnerabilities
+RUN apt-get update && apt-get upgrade -y && apt-get clean
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
@@ -12,7 +20,7 @@ ENV NODE_ENV $NODE_ENV
 
 # Install dependencies
 COPY package.json /usr/src/app/
-RUN npm install && npm cache clean --force
+RUN npm install --omit dev && npm cache clean --force
 
 # Copy required src (see .dockerignore)
 COPY . /usr/src/app
